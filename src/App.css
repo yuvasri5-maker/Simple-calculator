@@ -151,7 +151,6 @@ button:active {
   color: white;
 }
 
-/* Delete button */
 
 .delete {
   background: #713f12;
@@ -185,7 +184,6 @@ button:active {
   color: white;
 }
 
-/* Zero button */
 
 .zero {
   grid-column: span 2;

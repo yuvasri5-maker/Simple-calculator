@@ -1,202 +1,139 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
   const [display, setDisplay] = useState("");
 
-  const handleClick = (value) => {
-    setDisplay((prev) => prev + value);
-  };
+  function Add(value) {
+    setDisplay(display + value);
+  }
 
-  const clearDisplay = () => {
+  function Clear() {
     setDisplay("");
-  };
+  }
 
-  const deleteLast = () => {
-    setDisplay((prev) => prev.slice(0, -1));
-  };
+  function Delete() {
+    setDisplay(display.slice(0, -1));
+  }
 
-  const calculateResult = (value) => {
+  function Calculate() {
     let numbers;
     let result;
 
-    if (value.includes("+")) {
-      numbers = value.split("+");
+    if (display.includes("+")) {
+      numbers = display.split("+");
+      result = Number(numbers[0]) + Number(numbers[1]);
+    }
 
-      if (numbers.length === 2) {
-        result = Number(numbers[0]) + Number(numbers[1]);
+    else if (display.includes("-")) {
+      numbers = display.split("-");
+      result = Number(numbers[0]) - Number(numbers[1]);
+    }
+
+    else if (display.includes("*")) {
+      numbers = display.split("*");
+      result = Number(numbers[0]) * Number(numbers[1]);
+    }
+
+    else if (display.includes("/")) {
+      numbers = display.split("/");
+
+      if (Number(numbers[1]) === 0) {
+        setDisplay("Error");
+        return;
       }
-    } else if (value.includes("-")) {
-      numbers = value.split("-");
 
-      if (numbers.length === 2) {
-        result = Number(numbers[0]) - Number(numbers[1]);
-      }
-    } else if (value.includes("*")) {
-      numbers = value.split("*");
+      result = Number(numbers[0]) / Number(numbers[1]);
+    }
 
-      if (numbers.length === 2) {
-        result = Number(numbers[0]) * Number(numbers[1]);
-      }
-    } else if (value.includes("/")) {
-      numbers = value.split("/");
+    else {
+      return;
+    }
 
-      if (numbers.length === 2) {
-        if (Number(numbers[1]) === 0) {
-          return "Cannot divide by 0";
-        }
-
-        result = Number(numbers[0]) / Number(numbers[1]);
-      }
+    if (isNaN(result)) {
+      setDisplay("Error");
     } else {
-      return value;
+      setDisplay(String(result));
+    }
+  }
+
+  function handleKeyDown(e) {
+    if (e.key >= "0" && e.key <= "9") {
+      Add(e.key);
     }
 
-    if (result === undefined || Number.isNaN(result)) {
-      return "Error";
+    else if (e.key === "+") {
+      Add("+");
     }
 
-    return String(result);
-  };
+    else if (e.key === "-") {
+      Add("-");
+    }
 
-  const calculate = () => {
-    setDisplay((currentDisplay) => {
-      if (currentDisplay === "") {
-        return "";
-      }
+    else if (e.key === "*") {
+      Add("*");
+    }
 
-      return calculateResult(currentDisplay);
-    });
-  };
+    else if (e.key === "/") {
+      e.preventDefault();
+      Add("/");
+    }
+
+    else if (e.key === ".") {
+      Add(".");
+    }
+
+    else if (e.key === "Enter") {
+      Calculate();
+    }
+
+    else if (e.key === "Backspace") {
+      Delete();
+    }
+
+    else if (e.key === "Escape") {
+      Clear();
+    }
+  }
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      const key = event.key;
-
-      if (key >= "0" && key <= "9") {
-        setDisplay((prev) => prev + key);
-      } else if (key === "+") {
-        setDisplay((prev) => prev + "+");
-      } else if (key === "-") {
-        setDisplay((prev) => prev + "-");
-      } else if (key === "*") {
-        setDisplay((prev) => prev + "*");
-      } else if (key === "/") {
-        event.preventDefault();
-        setDisplay((prev) => prev + "/");
-      } else if (key === ".") {
-        setDisplay((prev) => prev + ".");
-      } else if (key === "Enter" || key === "=") {
-        event.preventDefault();
-        calculate();
-      } else if (key === "Backspace") {
-        deleteLast();
-      } else if (key === "Escape") {
-        clearDisplay();
-      }
-    };
-
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   });
 
-  const createButton = (text, className, onClick) => {
-    return React.createElement(
-      "button",
-      {
-        className: className,
-        onClick: onClick
-      },
-      text
-    );
-  };
+  return (
+    <div className="app">
+      <div className="calculator">
+        <h1>Calculator</h1>
+        <div className="display">
+          {display || "0"}
+        </div>
+        <div className="buttons">
+          <button className="clear" onClick={Clear}>AC</button>
+          <button className="delete" onClick={Delete}>DEL</button>
+          <button className="operator" onClick={() => Add("/")}>÷</button>
+          <button className="operator" onClick={() => Add("*")}> ×</button>
+          <button onClick={() => Add("7")}>7</button>
+          <button onClick={() => Add("8")}>8</button>
+          <button onClick={() => Add("9")}>9</button>
+          <button className="operator" onClick={() => Add("-")}>−</button>
+          <button onClick={() => Add("4")}>4</button>
+          <button onClick={() => Add("5")}>5</button>
+          <button onClick={() => Add("6")}>6</button>
+          <button className="operator" onClick={() => Add("+")}>+</button>
+          <button onClick={() => Add("1")}>1</button>
+          <button onClick={() => Add("2")}>2</button>
+          <button onClick={() => Add("3")}>3</button>
 
-  return React.createElement(
-    "div",
-    { className: "app" },
+          <button className="equal" onClick={Calculate}>=</button>
+          <button className="zero" onClick={() => Add("0")}>0</button>
+          <button onClick={() => Add(".")}>.</button>
 
-    React.createElement(
-      "div",
-      { className: "calculator" },
-
-      React.createElement(
-        "h1",
-        null,
-        "Calculator"
-      ),
-
-      React.createElement(
-        "div",
-        { className: "display" },
-        display || "0"
-      ),
-
-      React.createElement(
-        "div",
-        { className: "buttons" },
-
-        createButton("AC", "clear", clearDisplay),
-
-        createButton("DEL", "delete", deleteLast),
-
-        createButton(
-          "÷",
-          "operator",
-          () => handleClick("/")
-        ),
-
-        createButton(
-          "×",
-          "operator",
-          () => handleClick("*")
-        ),
-
-        createButton("7", "", () => handleClick("7")),
-        createButton("8", "", () => handleClick("8")),
-        createButton("9", "", () => handleClick("9")),
-
-        createButton(
-          "−",
-          "operator",
-          () => handleClick("-")
-        ),
-
-        createButton("4", "", () => handleClick("4")),
-        createButton("5", "", () => handleClick("5")),
-        createButton("6", "", () => handleClick("6")),
-
-        createButton(
-          "+",
-          "operator",
-          () => handleClick("+")
-        ),
-
-        createButton("1", "", () => handleClick("1")),
-        createButton("2", "", () => handleClick("2")),
-        createButton("3", "", () => handleClick("3")),
-
-        createButton(
-          "=",
-          "equal",
-          calculate
-        ),
-
-        createButton(
-          "0",
-          "zero",
-          () => handleClick("0")
-        ),
-
-        createButton(
-          ".",
-          "",
-          () => handleClick(".")
-        )
-      )
-    )
+        </div>
+      </div>
+    </div>
   );
 }
 
